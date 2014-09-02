@@ -26,7 +26,7 @@ class testcase(test_package.Test):
 		self.driver.set_page_load_timeout(30)
 		self.manual_check_count=0
 
-	#@unittest.skip('skip')	
+	@unittest.skip('skip')	
 	def test_check_all_links(self):
 		'''
 		check all the links on the page is worked.
