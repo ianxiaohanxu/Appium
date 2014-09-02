@@ -14,17 +14,17 @@ import unittest, time, re, pdb
 
 
 def list_minus(small,big):
-		try:
-			assert (isinstance(small,list) & isinstance(big,list))
-		except AssertionError:
-			print 'list_minus argument must be list.'
-		
-		newlist=[]
-		for item in big:
-			if item not in small:
-				newlist.append(item)
-				
-		return newlist
+	try:
+		assert (isinstance(small,list) & isinstance(big,list))
+	except AssertionError:
+		print 'list_minus argument must be list.'
+	
+	newlist=[]
+	for item in big:
+		if item not in small:
+			newlist.append(item)
+			
+	return newlist
 		
 		
 class Test(unittest.TestCase):
