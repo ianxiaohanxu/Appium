@@ -78,8 +78,9 @@ class Test(unittest.TestCase):
 		Default find mode is 'by id'
 		'''
 		element=self.focus(what, how)
+		pre_url=self.driver.current_url
 		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, what, self.driver.current_url))
-		self.assertNotEqual(element.click(), TimeoutException, 'Time out when click this: %s is %s, on page "%s"' %(how, what, self.driver.current_url))
+		self.assertNotEqual(element.click(), TimeoutException, 'Time out when click this: %s is %s, on page "%s"' %(how, what, pre_url))
 		
 	def open(self, what, how='id'):
 		'''
@@ -135,14 +136,12 @@ class Test(unittest.TestCase):
 		href=link_item.get_attribute('href')
 		pre_win_handles=self.driver.window_handles[:]
 		pre_url=self.driver.current_url
-		#pdb.set_trace()
 		try:
-			#pdb.set_trace()
 			link_item.click()
 		except TimeoutException:
-			print 'Link not loaded completely in 30s, [Text is "%s", href is "%s", on page "%s"' %(text, href, self.driver.current_url)
+			print 'Link not loaded completely in 30s, [Text is "%s", href is "%s", on page "%s"' %(text, href, pre_url)
 			self.manual_check_count+=1
-			self.driver.get(self.base_url)
+			self.driver.get(pre_url)
 			self.displayed_links=[item for item in self.driver.find_elements_by_xpath('//a[@href]') if item.is_displayed()]
 			return
 		after_win_handles=self.driver.window_handles
@@ -150,21 +149,16 @@ class Test(unittest.TestCase):
 		#Open new page in same window
 		if pre_win_handles==after_win_handles:
 			if pre_url==after_url:
-				#pdb.set_trace()
 				try:
-					pdb.set_trace()
 					print 'Manual check that [Text is "%s", href is "%s", on page "%s"' %(link_item.text, link_item.get_attribute('href'), self.driver.current_url)
 				except StaleElementReferenceException:
-					self.driver.get(self.base_url)
+					self.driver.get(pre_url)
 					self.displayed_links=[item for item in self.driver.find_elements_by_xpath('//a[@href]') if item.is_displayed()]
 					return
 				self.manual_check_count+=1
-				#self.driver.get(self.base_url)
-				#self.displayed_links=[item for item in self.driver.find_elements_by_xpath('//a[@href]') if item.is_displayed()]
 				return
 			else:
-				#driver.back()
-				self.driver.get(self.base_url)
+				self.driver.get(pre_url)
 				self.displayed_links=[item for item in self.driver.find_elements_by_xpath('//a[@href]') if item.is_displayed()]
 				return
 
@@ -193,8 +187,7 @@ class Test(unittest.TestCase):
 			print 'No displayed link on the page! Address is "%s"' %self.driver.current_url
 			return
 				
-		for i in range(links_len-1):
-			#pdb.set_trace()
+		for i in range(links_len):
 			self.is_link_open(self.displayed_links[i])
 			
 		print ''
@@ -221,7 +214,6 @@ class Test(unittest.TestCase):
 		none_checked_page.add(self.base_url)
 		
 		while(len(none_checked_page)!=0):
-			#pdb.set_trace()
 			URL=none_checked_page.pop()
 			URL=URL.rstrip('/')
 			checked_page.add(URL)
@@ -238,10 +230,9 @@ class Test(unittest.TestCase):
 			append_set=set(item for item in append_set if (self.domain in item))
 			none_checked_page=none_checked_page.union(append_set)
 			
-			for i in range(links_len-1):
+			for i in range(links_len):
 				self.is_link_open(self.displayed_links[i])
 				
-			#self.driver.get(URL)
 				
 		print ''
 		print ''

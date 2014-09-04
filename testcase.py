@@ -15,16 +15,18 @@ import test_package
 
 class testcase(test_package.Test):
 	def setUp(self):
+		#self.driver = webdriver.Firefox()
 		self.driver = webdriver.Chrome()
 		self.driver.implicitly_wait(10)
 		self.domain='gatherhealth.com'
-		self.base_url ='https://gatherhealth.com'
+		self.base_url ='https://gatherhealth.com/'
+		#self.base_url ='https://github.com'
 		#self.base_url ='http://www.kaixin001.com/'
 		self.verificationErrors = []
 		self.accept_next_alert = True
 		self.displayed_links=[]
 		self.driver.get(self.base_url)
-		self.driver.set_page_load_timeout(30)
+		self.driver.set_page_load_timeout(10)
 		self.manual_check_count=0
 		#pdb.set_trace()
 		
