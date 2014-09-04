@@ -17,7 +17,8 @@ class testcase(test_package.Test):
 	def setUp(self):
 		self.driver = webdriver.Chrome()
 		self.driver.implicitly_wait(10)
-		self.base_url ='https://gatherhealth.com/'
+		self.domain='gatherhealth.com'
+		self.base_url ='https://gatherhealth.com'
 		#self.base_url ='http://www.kaixin001.com/'
 		self.verificationErrors = []
 		self.accept_next_alert = True
@@ -26,13 +27,19 @@ class testcase(test_package.Test):
 		self.driver.set_page_load_timeout(30)
 		self.manual_check_count=0
 		#pdb.set_trace()
-
-	#@unittest.skip('skip')	
+		
 	def test_check_all_links(self):
+		'''
+		check all pages and links in the website are worked.
+		'''
+		self.check_all_links()
+		
+	@unittest.skip('skip')	
+	def test_check_links(self):
 		'''
 		check all the links on the page is worked.
 		'''
-		pdb.set_trace()
+		#pdb.set_trace()
 		self.check_links()
 	
 	@unittest.skip('skip')	

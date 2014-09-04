@@ -68,7 +68,7 @@ class Test(unittest.TestCase):
 		'''
 		Default find mode is 'by id'
 		'''
-		self.assertTrue(self.is_element_present(how, what), 'Element not found, %s is %s' %(how, what))
+		self.assertTrue(self.is_element_present(how, what), 'Element not found, %s is %s, on page "%s"' %(how, what, self.driver.current_url))
 		element=self.driver.find_element(by=how, value=what)
 		return element
 		
@@ -78,8 +78,8 @@ class Test(unittest.TestCase):
 		Default find mode is 'by id'
 		'''
 		element=self.focus(what, how)
-		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s' %(how, what))
-		self.assertNotEqual(element.click(), TimeoutException, 'Time out when click this: %s is %s' %(how, what))
+		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, what, self.driver.current_url))
+		self.assertNotEqual(element.click(), TimeoutException, 'Time out when click this: %s is %s, on page "%s"' %(how, what, self.driver.current_url))
 		
 	def open(self, what, how='id'):
 		'''
@@ -93,7 +93,7 @@ class Test(unittest.TestCase):
 		
 	def clear(self, what, how='id'):
 		element=self.focus(what, how)
-		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s' %(how, what))
+		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, what, self.driver.current_url))
 		element.clear()
 		
 		
@@ -102,7 +102,7 @@ class Test(unittest.TestCase):
 		Default find mode is 'by id'
 		'''
 		element=self.focus(where, how)
-		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s' %(how, where))
+		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, where, self.driver.current_url))
 		element.send_keys(what)
 		
 		
@@ -125,7 +125,7 @@ class Test(unittest.TestCase):
 		
 	def select(self, what, where, how='id'):
 		element=self.focus(where, how)
-		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s' %(how, where))
+		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, where, self.driver.current_url))
 		Select(element).select_by_visible_text(what)
 		
 		
@@ -140,7 +140,7 @@ class Test(unittest.TestCase):
 			#pdb.set_trace()
 			link_item.click()
 		except TimeoutException:
-			print 'Page not loaded completely in 30s, [Text is "%s", href is "%s".' %(text, href)
+			print 'Link not loaded completely in 30s, [Text is "%s", href is "%s", on page "%s"' %(text, href, self.driver.current_url)
 			self.manual_check_count+=1
 			self.driver.get(self.base_url)
 			self.displayed_links=[item for item in self.driver.find_elements_by_xpath('//a[@href]') if item.is_displayed()]
@@ -152,7 +152,8 @@ class Test(unittest.TestCase):
 			if pre_url==after_url:
 				#pdb.set_trace()
 				try:
-					print 'Manual check that [Text is "%s", href is "%s".' %(link_item.text, link_item.get_attribute('href'))
+					pdb.set_trace()
+					print 'Manual check that [Text is "%s", href is "%s", on page "%s"' %(link_item.text, link_item.get_attribute('href'), self.driver.current_url)
 				except StaleElementReferenceException:
 					self.driver.get(self.base_url)
 					self.displayed_links=[item for item in self.driver.find_elements_by_xpath('//a[@href]') if item.is_displayed()]
@@ -186,13 +187,10 @@ class Test(unittest.TestCase):
 		#global displayed_links
 		print ''
 		links=self.driver.find_elements_by_xpath('//a[@href]')
-		if len(links)==0:
-			print 'No link on the page!'
-			return
 		self.displayed_links=[item for item in links if item.is_displayed()]	
 		links_len=len(self.displayed_links)
 		if links_len==0:
-			print 'No displayed link on the page!'
+			print 'No displayed link on the page! Address is "%s"' %self.driver.current_url
 			return
 				
 		for i in range(links_len-1):
@@ -210,6 +208,45 @@ class Test(unittest.TestCase):
 		self.enter('1234567890', 'i0116')
 		self.click('idSIButton9')
 	'''
+	
+	def check_all_links(self):
+		'''
+		Check all the pages and links in the website.
+		
+		'''
+		print ''
+		links_num=0
+		checked_page=set()
+		none_checked_page=set()
+		none_checked_page.add(self.base_url)
+		
+		while(len(none_checked_page)!=0):
+			#pdb.set_trace()
+			URL=none_checked_page.pop()
+			URL=URL.rstrip('/')
+			checked_page.add(URL)
+			self.driver.get(URL)
+			links=self.driver.find_elements_by_xpath('//a[@href]')
+			self.displayed_links=[item for item in links if item.is_displayed()]
+			links_len=len(self.displayed_links)
+			links_num+=links_len
+			if links_len==0:
+				print 'No link on the page! Address is "%s"' %URL
+				continue
+			displayed_set=set(item.get_attribute('href').rstrip('/') for item in self.displayed_links)
+			append_set=displayed_set-checked_page
+			append_set=set(item for item in append_set if (self.domain in item))
+			none_checked_page=none_checked_page.union(append_set)
+			
+			for i in range(links_len-1):
+				self.is_link_open(self.displayed_links[i])
+				
+			#self.driver.get(URL)
+				
+		print ''
+		print ''
+		print 'Totally %d pages be checked, and %d links be clicked, %d need be manual check.' %(len(checked_page), links_num, self.manual_check_count)
+		
 
 	def is_element_present(self, how, what):
 		try: 
