@@ -15,9 +15,9 @@ import test_package
 
 class testcase(test_package.Test):
 	def setUp(self):
-		self.driver = webdriver.Firefox()
+		self.driver = webdriver.Chrome()
 		self.driver.implicitly_wait(10)
-		self.base_url ='https://github.com/'
+		self.base_url ='https://gatherhealth.com/'
 		#self.base_url ='http://www.kaixin001.com/'
 		self.verificationErrors = []
 		self.accept_next_alert = True
@@ -25,14 +25,17 @@ class testcase(test_package.Test):
 		self.driver.get(self.base_url)
 		self.driver.set_page_load_timeout(30)
 		self.manual_check_count=0
+		#pdb.set_trace()
 
-	@unittest.skip('skip')	
+	#@unittest.skip('skip')	
 	def test_check_all_links(self):
 		'''
 		check all the links on the page is worked.
 		'''
+		pdb.set_trace()
 		self.check_links()
-		
+	
+	@unittest.skip('skip')	
 	def test_sign_up(self):
 		'''
 		make a new account.
