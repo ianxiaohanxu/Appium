@@ -226,6 +226,22 @@ class mobiletest(unittest.TestCase):
 	#zoom out
 	def zoom_out(self, element = None, percent = 200, steps = 50):
 		self.driver.pinch(element, percent, steps)
+		
+	#capture a picture for an element
+	def capture(self, what):
+		begin = what.location
+		size = what.size
+		start_x = begin['x']
+		start_y = begin['y']
+		end_x = start_x + size['width']
+		end_y = start_y + size['height']
+		name = str(start_x)+'_'+str(start_y)+'_'+str(end_x)+'_'+str(end_y)
+		box = (start_x, start_y, end_x, end_y)
+		self.driver.get_screenshot_as_file(tmp + '/' + 'full_screen.png')
+		image = Image.open(tmp + '/' + 'full_screen.png')
+		newimage = image.crop(box)
+		newimage.save(tmp + '/' + name + '.png')
+		os.popen('rm %s/full_screen.png' %tmp)
 	
 	
 	
