@@ -64,7 +64,7 @@ class Test(unittest.TestCase):
 		self.driver.switch_to_window(To_window)
 		
 		
-	def focus(self, what, how='id'):
+	def focus(self, what, how='partial link text'):
 		'''
 		Default find mode is 'by id'
 		'''
@@ -73,7 +73,7 @@ class Test(unittest.TestCase):
 		return element
 		
 		
-	def click(self, what, how='id'):
+	def click(self, what, how='partial link text'):
 		'''
 		Default find mode is 'by id'
 		'''
@@ -82,7 +82,7 @@ class Test(unittest.TestCase):
 		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, what, self.driver.current_url))
 		self.assertNotEqual(element.click(), TimeoutException, 'Time out when click this: %s is %s, on page "%s"' %(how, what, pre_url))
 		
-	def open(self, what, how='id'):
+	def Open(self, what, how='partial link text'):
 		'''
 		Default find mode is 'by id'
 		'''
@@ -92,13 +92,13 @@ class Test(unittest.TestCase):
 			self.driver.switch_to_window(self.driver.window_handles[-1])
 			
 		
-	def clear(self, what, how='id'):
+	def clear(self, what, how='partial link text'):
 		element=self.focus(what, how)
 		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, what, self.driver.current_url))
 		element.clear()
 		
 		
-	def enter(self, what, where, how='id'):
+	def enter(self, what, where, how='partial link text'):
 		'''
 		Default find mode is 'by id'
 		'''
@@ -106,6 +106,21 @@ class Test(unittest.TestCase):
 		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, where, self.driver.current_url))
 		element.send_keys(what)
 		
+	
+	def scroll(self, what, how='partial link text'):
+		'''
+		Scroll to an element, default find mode is 'by id'
+		'''
+		element=self.focus(what, how)
+		self.driver.execute_script('arguments[0].scrollIntoView();', element)
+		
+		
+	def back(self):
+		self.driver.back()
+		
+		
+	def forward(self):
+		self.driver.forward()
 		
 	def switch(self,title=None):
 		if title==None:
@@ -124,7 +139,7 @@ class Test(unittest.TestCase):
 					break
 		
 		
-	def select(self, what, where, how='id'):
+	def select(self, what, where, how='partial link text'):
 		element=self.focus(where, how)
 		self.assertTrue(element.is_displayed(),'The item you focus is not displayed, %s is %s, on page "%s"' %(how, where, self.driver.current_url))
 		Select(element).select_by_visible_text(what)

@@ -5,6 +5,12 @@ from appium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from appium.webdriver.common.touch_action import TouchAction
 
+
+character_keycode = {'0': 7, '1' : 8, '2' : 9, '3' : 10, '4' : 11, '5' : 12, '6' : 13, '7' : 14, '8' : 15, '9' : 16,'a': 29, 'b' : 30, 'c' : 31, 'd' : 32, 'e' : 33, 'f' : 34, 'g' : 35, 'h' : 36, 'i' : 37, 'j' : 38, 'k' : 39, 'l' : 40, 'm' : 41, 'n' : 42, 'o' : 43, 'p' : 44, 'q' : 45, 'r' : 46, 's' : 47, 't' : 48, 'u' : 49, 'v' : 50, 'w' : 51, 'x' : 52, 'y' : 53, 'z' : 54, ' ' : 62, '-' : 69, "'" : 75, ',' : 55, '.' : 56, '/' : 76, ';' : 74, '=' : 70, '[' : 71, '\\' : 73, ']' : 72, '`' : 68, ')': 7, '!' : 8, '@' : 9, '#' : 10, '$' : 11, '%' : 12, '^' : 13, '&' : 14, '*' : 15, '(' : 16,'A': 29, 'B' : 30, 'C' : 31, 'D' : 32, 'E' : 33, 'F' : 34, 'G' : 35, 'H' : 36, 'I' : 37, 'J' : 38, 'K' : 39, 'L' : 40, 'M' : 41, 'N' : 42, 'O' : 43, 'P' : 44, 'Q' : 45, 'R' : 46, 'S' : 47, 'T' : 48, 'U' : 49, 'V' : 50, 'W' : 51, 'X' : 52, 'Y' : 53, 'Z' : 54, '_' : 69, '"' : 75, '<' : 55, '>' : 56, '?' : 76, ':' : 74, '+' : 70, '{' : 71, '|' : 73, '}' : 72, '~' : 68}
+upper_key = ['!', '"', '#', '$', '%', '&', '(', ')', '*', '+', ':', '<', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '^', '_', '{', '|', '}', '~']
+lower_key = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9','a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '-', "'", ',', '.', '/', ';', '=', '[', '\\', ']', '`']
+
+
 class mobiletest(unittest.TestCase):
 
 	def setUp(self):
@@ -16,6 +22,20 @@ class mobiletest(unittest.TestCase):
 		self.android['Home']= 3
 		self.android['Back']= 4
 		self.android['Menu']= 82
+		self.letter_list= list(map(chr, range(32, 127)))
+		
+		
+	def keyout(self, what = None):
+		if (what is None) | (what == ''):
+			return
+		assert len(what) == 1, 'The parameter of keyout() must be one character.'
+		if what in lower_key:
+			self.driver.press_keycode(character_keycode[what])
+		elif what in upper_key:
+			self.driver.press_keycode(character_keycode[what], 193)
+		else:
+			assert 0, 'The character %s cannot be handled by keyout()' %what
+		
 
 	#press hardkey, if double press, pass in 'count = 2'
 	def press(self, keyName, count=1):
@@ -34,29 +54,65 @@ class mobiletest(unittest.TestCase):
 		
 	#find an item, return webelement object
 	def focus(self, text):
-		try:
-			item = self.driver.find_element_by_android_uiautomator('text("%s")' %text)
-			return item
-		except NoSuchElementException:
-			pass
+		if text in self.letter_list:
+			try:
+				item = self.driver.find_element_by_android_uiautomator('text("%s").focused(false)' %text)
+				return item
+			except NoSuchElementException:
+				pass
 			
-		try:
-			item = self.driver.find_element_by_android_uiautomator('description("%s")' %text)
-			return item
-		except NoSuchElementException:
-			pass
+			try:
+				item = self.driver.find_element_by_android_uiautomator('description("%s").focused(false)' %text)
+				return item
+			except NoSuchElementException:
+				pass
+				
+			try:
+				item = self.driver.find_element_by_id(text)
+				return item
+			except NoSuchElementException:
+				pass
+				
+			try:
+				item = self.driver.find_element_by_android_uiautomator('textContains("%s").focused(false)' %text)
+				return item
+			except NoSuchElementException:
+				pass
 			
-		try:
-			item = self.driver.find_element_by_android_uiautomator('textContains("%s")' %text)
-			return item
-		except NoSuchElementException:
-			pass
+			try:
+				item = self.driver.find_element_by_android_uiautomator('descriptionContains("%s").focused(false)' %text)
+				return item
+			except NoSuchElementException:
+				raise NoSuchElementException
+		else:
+			try:
+				item = self.driver.find_element_by_android_uiautomator('text("%s")' %text)
+				return item
+			except NoSuchElementException:
+				pass
 			
-		try:
-			item = self.driver.find_element_by_android_uiautomator('descriptionContains("%s")' %text)
-			return item
-		except NoSuchElementException:
-			raise NoSuchElementException
+			try:
+				item = self.driver.find_element_by_android_uiautomator('description("%s")' %text)
+				return item
+			except NoSuchElementException:
+				pass
+			try:
+				item = self.driver.find_element_by_id(text)
+				return item
+			except NoSuchElementException:
+				pass
+				
+			try:
+				item = self.driver.find_element_by_android_uiautomator('textContains("%s")' %text)
+				return item
+			except NoSuchElementException:
+				pass
+			
+			try:
+				item = self.driver.find_element_by_android_uiautomator('descriptionContains("%s")' %text)
+				return item
+			except NoSuchElementException:
+				raise NoSuchElementException
 		
 	#tap some item with text or description attribute
 	def click(self, text, count=1):
@@ -67,10 +123,11 @@ class mobiletest(unittest.TestCase):
 			sleep(0.5)
 			
 	#long tap some item with text or description attribute
-	def long_click(self, text):
+	def long_click(self, text, duration = 1000):
 		item = self.focus(text)
 		action = TouchAction(self.driver)
-		action.long_press(el = item).release()
+		action.long_press(el = item, duration = duration)
+		action.release()
 		action.perform()
 		
 	#tap a coordinates (x,y)
@@ -85,20 +142,49 @@ class mobiletest(unittest.TestCase):
 			sleep(0.5)
 		
 	#long tap a coordinates (x,y)
-	def long_tap(self, x = None, y = None):
+	def long_tap(self, x = None, y = None, duration = 1000):
 		if (x == None) | (y == None) | (x > self.X) | (y > self.Y):
 			self.assertTrue(0, 'Please input correct coordinates')
 		action = TouchAction(self.driver)
-		action.long_press(x = x, y = y).release()
+		action.long_press(x = x, y = y, duration = duration).release()
 		action.perform()
 		
 	#input something into edit field
 	def enter(self, what, where):
-		where.send_keys(what)
+		where.click()
+		sleep(1)
+		self.driver.press_keycode(123)
+		for letter in what:
+			self.keyout(letter)
+		
+		'''
+		try:
+			where.set_text(what)
+		except NoSuchElementException:
+			pass
+		'''
 		
 	#clear the edit field
 	def clear(self, where):
-		where.clear()
+		
+		#pdb.set_trace()
+		#start_time = time.time()
+		where.click()
+		sleep(1)
+		self.driver.press_keycode(29,28672)
+		#pdb.set_trace()
+		self.driver.press_keycode(112)
+		
+		
+		'''
+		try:
+			where.clear()
+		except NoSuchElementException:
+			pass
+		end_time = time.time()
+		duration = end_time - start_time
+		pdb.set_trace()
+		'''
 		
 	#drag something to somewhere
 	def drag(self, origin_el = None, target_el = None, x = None, y = None):
