@@ -39,9 +39,13 @@ class Test(unittest.TestCase):
 		#self.driver.get(self.base_url)
 		#self.driver.set_page_load_timeout(10)
 		self.manual_check_count=0
+		self.output = []
 		#self.current_window=self.driver.current_window_handle
 	
-	
+	def myPrint(self, text = None):
+		self.output.append(text)
+		print text
+		
 	def close_window(self, close, To_window=None):
 		if To_window==None:
 			To_window=self.driver.current_window_handle
@@ -57,7 +61,7 @@ class Test(unittest.TestCase):
 				self.driver.close()
 			except NoSuchWindowException:
 				#pdb.set_trace()
-				print '%s not found.' %close
+				self.myPrint('%s not found.' %close)
 			
 		
 		# switch to target window
@@ -133,7 +137,7 @@ class Test(unittest.TestCase):
 				try:
 					self.driver.switch_to_window(window)
 				except NoSuchWindowException:
-					print '%s not found.' %window
+					self.myPrint('%s not found.' %window)
 					continue
 				if self.driver.title==title:
 					break
@@ -154,7 +158,7 @@ class Test(unittest.TestCase):
 		try:
 			link_item.click()
 		except TimeoutException:
-			print 'Link not loaded completely in 30s, [Text is "%s", href is "%s", on page "%s"' %(text, href, pre_url)
+			self.myPrint('Link not loaded completely in 30s, [Text is "%s", href is "%s", on page "%s"' %(text, href, pre_url))
 			self.manual_check_count+=1
 			self.driver.get(pre_url)
 			self.displayed_links=[item for item in self.driver.find_elements_by_xpath('//a[@href]') if item.is_displayed()]
@@ -165,7 +169,7 @@ class Test(unittest.TestCase):
 		if pre_win_handles==after_win_handles:
 			if pre_url==after_url:
 				try:
-					print 'Manual check that [Text is "%s", href is "%s", on page "%s"' %(link_item.text, link_item.get_attribute('href'), self.driver.current_url)
+					self.myPrint('Manual check that [Text is "%s", href is "%s", on page "%s"' %(link_item.text, link_item.get_attribute('href'), self.driver.current_url))
 				except StaleElementReferenceException:
 					self.driver.get(pre_url)
 					self.displayed_links=[item for item in self.driver.find_elements_by_xpath('//a[@href]') if item.is_displayed()]
@@ -199,15 +203,15 @@ class Test(unittest.TestCase):
 		self.displayed_links=[item for item in links if item.is_displayed()]	
 		links_len=len(self.displayed_links)
 		if links_len==0:
-			print 'No displayed link on the page! Address is "%s"' %self.driver.current_url
+			self.myPrint('No displayed link on the page! Address is "%s"' %self.driver.current_url)
 			return
 				
 		for i in range(links_len):
 			self.is_link_open(self.displayed_links[i])
 			
-		print ''
-		print ''
-		print 'Totally %d links on the page, %d links need to be MANUAL CHECK.' %(links_len, self.manual_check_count)
+		self.myPrint('')
+		self.myPrint('')
+		self.myPrint('Totally %d links on the page, %d links need to be MANUAL CHECK.' %(links_len, self.manual_check_count))
 	'''
 	def runTest(self):
 		pdb.set_trace()

@@ -36,7 +36,7 @@ class testcase(test_package.Test):
 		'''
 		self.check_all_links()
 		
-	@unittest.skip('skip')	
+	#@unittest.skip('skip')	
 	def test_check_links(self):
 		'''
 		check all the links on the page is worked.
