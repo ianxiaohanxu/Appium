@@ -73,8 +73,8 @@ class Test(unittest.TestCase):
 		Default find mode is 'by id'
 		'''
 		self.assertTrue(self.is_element_present(how, what), 'Element not found, %s is %s, on page "%s"' %(how, what, self.driver.current_url))
-		element=self.driver.find_element(by=how, value=what)
-		return element
+		return self.driver.find_element(by=how, value=what)
+		
 		
 		
 	def click(self, what, how='partial link text'):
